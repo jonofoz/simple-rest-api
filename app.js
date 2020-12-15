@@ -53,6 +53,7 @@ router.put('/modify/:recordId', async (req, res) => {
     try {
         const recordId = req.params.recordId;
         const fieldsToUpdate = req.body;
+        fieldsToUpdate.lastModificationDate = new Date().getTime();
         const record = await collection.findOneAndUpdate(
             { _id: ObjectID(recordId) },
             { $set: fieldsToUpdate },
