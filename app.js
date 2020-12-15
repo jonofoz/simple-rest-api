@@ -53,16 +53,16 @@ router.put('/modify/:recordId', async (req, res) => {
     try {
         const recordId = req.params.recordId;
         const fieldsToUpdate = req.body;
-        const result = await collection.findOneAndUpdate(
+        const record = await collection.findOneAndUpdate(
             { _id: ObjectID(recordId) },
-            { $set: fieldsToUpdate }
-        )
-        if (result.value == null) {
+            { $set: fieldsToUpdate },
+            { returnOriginal: false }
+        ).then(result => result.value)
+        if (record == null) {
             throw new Error(`No record with ID ${recordId} was found.`);
         }
-        const updatedRecord = await collection.findOne({ _id: ObjectID(recordId) });
         console.log(`Record ${recordId} updated successfully.`);
-        res.json(updatedRecord);
+        res.json(record);
     }
     catch (err) {
         res.send({ error: err.message });
