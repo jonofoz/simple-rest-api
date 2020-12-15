@@ -4,6 +4,9 @@
   "description": "For convenience, the challenge docs can be found [here](https://github.com/tagup/challenges/tree/master/backend).",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
+    "setup": "node setup.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,9 +22,9 @@
   "homepage": "https://github.com/jonofoz/tagup-challenge-rest-api#readme",
   "dependencies": {
     "axios": "^0.21.0",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongodb": "^3.6.3",
-    "mongoose": "^5.11.7"
+    "mongodb": "^3.6.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.6"
