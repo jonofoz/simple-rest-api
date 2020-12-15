@@ -14,12 +14,9 @@ const db = client.db('default');
 const collection = db.collection('starterData');
 
 router.get('/list', async (req, res) => {
-    // Store cursor for all records in the DB
-    const cursor = await collection.find({});
-    const records = await cursor.toArray()
-    const numberOfRecords = records.length
-    console.log(`${numberOfRecords} records fetched successfully.`)
-    res.json(records);
+    const allRecords = await collection.find({}).toArray()
+    console.log(`${allRecords.length} records fetched successfully.`)
+    res.json(allRecords);
 })
 router.post('/create', async (req, res) => {
     // TODO: DB
