@@ -7,7 +7,6 @@ const URI = process.env.MONGO_URI || process.env.MONGO_URI_DEFAULT;
 
 const client = MongoClient(URI, {useUnifiedTopology: true});
 
-
 async function disconnectFromDB(exitStatus=null) {
     try {
         await client.close();
