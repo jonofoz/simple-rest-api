@@ -14,9 +14,12 @@ const db = client.db('default');
 const collection = db.collection('starterData');
 
 router.get('/list', async (req, res) => {
-    const allRecords = await collection.find({}).toArray()
-    console.log(`${allRecords.length} records fetched successfully.`)
-    res.json(allRecords);
+    try {
+        const allRecords = await collection.find({}).toArray()
+        console.log(`${allRecords.length} records fetched successfully.`)
+        res.json(allRecords);
+    }
+    catch (err) { res.send({message: `An error occurred: ${err.message}`}) }
 })
 router.post('/create', async (req, res) => {
     // TODO: DB
