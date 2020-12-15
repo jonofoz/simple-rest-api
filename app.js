@@ -7,14 +7,13 @@ const PORT = process.env.PORT      || 5000;
 const URI  = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017';
 
 const client = MongoClient(URI, {useUnifiedTopology: true});
-
 app.use(express.json());
 
 (async () => await client.connect())();
+const db = client.db('default');
+const collection = db.collection('starterData');
 
 router.get('/list', async (req, res) => {
-    const db = client.db('default');
-    const collection = db.collection('starterData');
     // Store cursor for all records in the DB
     const cursor = await collection.find({});
     const records = await cursor.toArray()
