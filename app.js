@@ -1,7 +1,7 @@
 const express = require('express');
 const { MongoClient, ObjectID } = require('mongodb');
 const app = express();
-const router = express.Router()
+const router = express.Router();
 
 const PORT = process.env.PORT      || 5000;
 const URI  = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017';
@@ -15,8 +15,8 @@ const collection = db.collection('starterData');
 
 router.get('/list', async (req, res) => {
     try {
-        const allRecords = await collection.find({}).toArray()
-        console.log(`${allRecords.length} records fetched successfully.`)
+        const allRecords = await collection.find({}).toArray();
+        console.log(`${allRecords.length} records fetched successfully.`);
         res.json(allRecords);
     }
     catch (err) {
@@ -27,9 +27,9 @@ router.post('/create', async (req, res) => {
     try {
         const record = req.body;
         record.creationDate = record.lastModificationDate = new Date().getTime();
-        await collection.insertOne(record)
-        console.log('Record created successfully.')
-        res.status(201).json(record)
+        await collection.insertOne(record);
+        console.log('Record created successfully.');
+        res.status(201).json(record);
     }
     catch (err) {
         res.send({ error: err.message })
@@ -38,15 +38,15 @@ router.post('/create', async (req, res) => {
 router.get('/read/:recordId', async (req, res) => {
     try {
         const recordId = req.params.recordId;
-        const record = await collection.findOne({ _id: ObjectID(recordId) })
+        const record = await collection.findOne({ _id: ObjectID(recordId) });
         if (record == null) {
             throw new Error(`No record with ID ${recordId} was found.`);
         }
-        console.log(`Record ${recordId} fetched successfully.`)
+        console.log(`Record ${recordId} fetched successfully.`);
         res.json(record);
     }
     catch (err) {
-        res.send({ error: err.message })
+        res.send({ error: err.message });
     }
 
 })
@@ -73,7 +73,7 @@ router.delete('/remove/:recordId', async (req, res) => {
     // TODO: DB
     const recordId = req.params.recordId;
     const record = {};
-    console.log(`Record ${recordId} deleted successfully.`)
+    console.log(`Record ${recordId} deleted successfully.`);
     res.json(record);
 })
 
