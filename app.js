@@ -22,11 +22,14 @@ router.get('/list', async (req, res) => {
     catch (err) { res.send({message: `An error occurred: ${err.message}`}) }
 })
 router.post('/create', async (req, res) => {
-    // TODO: DB
-    const record = req.body;
-    console.log('Record created successfully.')
-    // Node's default response.statusCode is 200, so we specify others like 201 as needed.
-    res.status(201).json(record);
+    try {
+        const record = req.body;
+        record.creationDate = record.lastModificationDate = new Date().getTime();
+        await collection.insertOne(record)
+        console.log('Record created successfully.')
+        res.status(201).json(record)
+    }
+    catch (err) { res.send({message: `An error occurred: ${err.message}`}) }
 })
 router.get('/read/:recordId', async (req, res) => {
     // TODO: DB
