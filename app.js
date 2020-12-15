@@ -48,7 +48,6 @@ router.get('/read/:recordId', async (req, res) => {
     catch (err) {
         res.send({ error: err.message });
     }
-
 })
 router.put('/modify/:recordId', async (req, res) => {
     try {
@@ -70,11 +69,18 @@ router.put('/modify/:recordId', async (req, res) => {
     }
 })
 router.delete('/remove/:recordId', async (req, res) => {
-    // TODO: DB
-    const recordId = req.params.recordId;
-    const record = {};
-    console.log(`Record ${recordId} deleted successfully.`);
-    res.json(record);
+    try {
+        const recordId = req.params.recordId;
+        const deletedRecord = await collection.findOneAndDelete({ _id: ObjectID(recordId) }).then((result) => result.value);
+        if (deletedRecord == null) {
+            throw new Error(`No record with ID ${recordId} was found.`);
+        }
+        console.log(`Record deleted successfully. (ID: ${recordId})`);
+        res.json(deletedRecord);
+    }
+    catch (err) {
+        res.send({ error: err.message });
+    }
 })
 
 app.use('/api', router);
