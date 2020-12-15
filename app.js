@@ -19,7 +19,9 @@ router.get('/list', async (req, res) => {
         console.log(`${allRecords.length} records fetched successfully.`)
         res.json(allRecords);
     }
-    catch (err) { res.send({message: `An error occurred: ${err.message}`}) }
+    catch (err) {
+        res.send({ error: err.message })
+    }
 })
 router.post('/create', async (req, res) => {
     try {
@@ -29,7 +31,9 @@ router.post('/create', async (req, res) => {
         console.log('Record created successfully.')
         res.status(201).json(record)
     }
-    catch (err) { res.send({message: `An error occurred: ${err.message}`}) }
+    catch (err) {
+        res.send({ error: err.message })
+    }
 })
 router.get('/read/:recordId', async (req, res) => {
     try {
