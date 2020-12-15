@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectID } = require('mongodb');
 const app = express();
 const router = express.Router()
 
@@ -32,11 +32,19 @@ router.post('/create', async (req, res) => {
     catch (err) { res.send({message: `An error occurred: ${err.message}`}) }
 })
 router.get('/read/:recordId', async (req, res) => {
-    // TODO: DB
-    const recordId = req.params.recordId;
-    const record = {};
-    console.log(`Record ${recordId} fetched successfully.`)
-    res.json(record);
+    try {
+        const recordId = req.params.recordId;
+        const record = await collection.findOne({ _id: ObjectID(recordId) })
+        if (record == null) {
+            throw new Error(`No record with ID ${recordId} was found.`);
+        }
+        console.log(`Record ${recordId} fetched successfully.`)
+        res.json(record);
+    }
+    catch (err) {
+        res.send({ error: err.message })
+    }
+
 })
 router.put('/modify/:recordId', async (req, res) => {
     // TODO: DB
