@@ -3,6 +3,7 @@ const { ObjectID } = require('mongodb');
 const { MongoClient } = require('mongodb');
 
 const starterData = require('./starterData');
+// MONGO_URI_DEFAULT typically expected to be mongodb://127.0.0.1:27017
 const URI = process.env.MONGO_URI || process.env.MONGO_URI_DEFAULT;
 
 const client = MongoClient(URI, {useUnifiedTopology: true});
