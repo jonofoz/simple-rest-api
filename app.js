@@ -11,9 +11,7 @@ const URI = process.env.MONGO_URI || process.env.MONGO_URI_DEFAULT;
 const client = MongoClient(URI, {useUnifiedTopology: true});
 app.use(express.json());
 
-(async () => await client.connect())();
-const db = client.db('default');
-const collection = db.collection('starterData');
+var db, collection;
 
 router.get('/list', async (req, res) => {
     try {
@@ -22,7 +20,7 @@ router.get('/list', async (req, res) => {
         res.json(allRecords);
     }
     catch (err) {
-        res.send({ error: err.message })
+        res.send({ error: err.message });
     }
 })
 router.post('/create', async (req, res) => {
@@ -88,4 +86,12 @@ router.delete('/remove/:recordId', async (req, res) => {
 
 app.use('/api', router);
 
-app.listen(PORT);
+app.listen(PORT, () => {
+    MongoClient.connect(URI, { useUnifiedTopology: true }, (err, client) => {
+        if (err) {
+            throw err;
+        }
+        db = client.db('default');
+        collection = db.collection('starterData');
+    })
+});
