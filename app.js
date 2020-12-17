@@ -1,5 +1,7 @@
 require('dotenv').config()
 const express = require('express');
+const bodyParser = require("body-parser");
+const cors = require("cors");
 const { MongoClient, ObjectID } = require('mongodb');
 const app = express();
 const router = express.Router();
@@ -10,6 +12,7 @@ const URI = process.env.MONGO_URI || process.env.MONGO_URI_DEFAULT;
 
 const client = MongoClient(URI, {useUnifiedTopology: true});
 app.use(express.json());
+app.use(cors({optionsSuccessStatus: 200}));
 
 var db, collection;
 
