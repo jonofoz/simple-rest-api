@@ -55,15 +55,16 @@ APIrouter.use(
  *       type: object
  *       properties:
  *         _id:
- *           description: The 12 byte, hexademical representation of a MongoDB ObjectId
+ *           description: The 12 byte, hexademical representation of an automatically-generated MongoDB ObjectId
  *           type: string
  *           format: byte
- *           example: 5fdb9473354a9f3b6cf7cdee
+ *           example: '999999999999999999999999'
  *         timestamp:
  *           description: The unix time, in milliseconds, that the record was created
  *           type: integer
  *           example: 1578031200000
  *         value1:
+ *           description: A string (does not have to be a name)
  *           type: string
  *           example: Lowe Pannaman
  *         value2:
@@ -73,14 +74,14 @@ APIrouter.use(
  *         value3:
  *           type: boolean
  *           example: false
- *         lastModificationDate:
- *           description: The unix timestamp, in milliseconds, of the last time the record was modified
- *           type: integer
- *           example: 1608225907502
  *         creationDate:
  *           description: The unix timestamp, in milliseconds, that the record was first saved to the database
  *           type: integer
- *           example: 1608225907502
+ *           example: 1608239798195
+ *         lastModificationDate:
+ *           description: The unix timestamp, in milliseconds, of the last time the record was modified
+ *           type: integer
+ *           example: 1608239798195
  */
 
 /**
@@ -118,7 +119,7 @@ APIrouter.get('/list', async (req, res, next) => {
  *     - name: recordId
  *       in: path
  *       description: The 12 byte, hexademical representation of a MongoDB ObjectId
- *       example: 5fdb9473354a9f3b6cf7cdee
+ *       example: '999999999999999999999999'
  *       required: true
  *       schema:
  *         type: string
@@ -131,9 +132,9 @@ APIrouter.get('/list', async (req, res, next) => {
  *             schema:
  *               $ref: '#/components/schemas/Record'
  *       "400":
- *         description: ID supplied was not valid
+ *         description: ID supplied to URI path wasn't valid
  *       "404":
- *         description: Record with that ID wasn't found
+ *         description: No record with that ID was found
  */
 APIrouter.get('/read/:recordId', async (req, res, next) => {
     try {
@@ -158,27 +159,27 @@ APIrouter.get('/read/:recordId', async (req, res, next) => {
  *     - API
  *     summary: Add a new record to the database
  *     requestBody:
- *       description: Any combination of the fields in an existing record can be modified. If the field did not already exist in the record, it will be added.
+ *       description: Any combination of the fields—except for `_id`—can be specified. If the field did not already exist in the record, it will be added.
  *       content:
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/Record'
+ *           example:
+ *             timestamp: 1500434700000
+ *             value1: "Vashti Bunyan"
+ *             value2: 26.4
+ *             value3: true
  *     responses:
- *       "200":
+ *       "201":
  *         description: Record was created successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Record'
- *             example:
- *               timestamp: 1500434700000
- *               value1: "Vashti Bunyan"
- *               value2: 26.4
- *               value3: true
  *       "400":
  *         description: ID supplied to URI path wasn't valid, or the user tried to supply `_id` in the body
  *       "404":
- *         description: Record with that ID wasn't found
+ *         description: No record with that ID was found
  */
 APIrouter.post('/create', async (req, res, next) => {
     try {
@@ -208,13 +209,13 @@ APIrouter.post('/create', async (req, res, next) => {
  *     - name: recordId
  *       in: path
  *       description: The 12 byte, hexademical representation of a MongoDB ObjectId
- *       example: 5fdb9473354a9f3b6cf7cdec
+ *       example: '777777777777777777777777'
  *       required: true
  *       schema:
  *         type: string
  *         format: byte
  *     requestBody:
- *       description: Any combination of the fields in an existing record can be modified. If the field did not already exist in the record, it will be added.
+ *       description: Any combination of the fields—except for `_id`—in an existing record can be modified. If the field did not already exist in the record, it will be added.
  *       content:
  *         application/json:
  *           schema:
@@ -225,13 +226,13 @@ APIrouter.post('/create', async (req, res, next) => {
  *             value3: true
  *     responses:
  *       "200":
- *         description: Record was modified successfully and the new version was returned
+ *         description: Record was modified successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Record'
  *       "400":
- *         description: Supplied ID wasn't valid
+ *         description: ID supplied to URI path wasn't valid, or the user tried to manipulate `_id` in the body
  *       "404":
  *         description: No record with that ID was found
  */
@@ -267,7 +268,7 @@ APIrouter.put('/modify/:recordId', async (req, res, next) => {
  *     - name: recordId
  *       in: path
  *       description: The 12 byte, hexademical representation of a MongoDB ObjectId
- *       example: 5fdb9473354a9f3b6cf7cdea
+ *       example: '555555555555555555555555'
  *       required: true
  *       schema:
  *         type: string

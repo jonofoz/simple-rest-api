@@ -32,7 +32,7 @@ async function setupStarterData() {
         // Populate the collection with the starterData
         for await (let doc of starterData) {
             try {
-                doc.creationDate = doc.lastModificationDate = new Date().getTime();
+                doc.lastModificationDate = doc.creationDate = new Date().getTime();
                 await collection.insertOne(doc);
             }
             catch (err) {
