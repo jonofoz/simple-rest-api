@@ -2,6 +2,16 @@ const express = require('express');
 const { ObjectID } = require('mongodb');
 const APIrouter = express.Router();
 
+// Error messages: some custom, some from MongoDB
+const errorMessages = {
+    // 400
+    ID_WAS_SUPPLIED: 'Supplying the _id field is not allowed',
+    MONGO_ID_INVALID: 'Argument passed in must be a single String of 12 bytes or a string of 24 hex characters',
+    MONGO_ID_MODIFICATION_ATTEMPT: 'Performing an update on the path \'_id\' would modify the immutable field \'_id\'',
+    // 404
+    MONGO_ID_NOT_FOUND: 'No record with ID'
+}
+
 // Swagger - documentation setup
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -20,9 +30,9 @@ const options = {
         },
         // TODO: Determine which servers are available to execute API calls on, depending on where the documentation is hosted.
       servers: [
+        { url: "http://localhost:5000/" },
         { url: "https://simple-rest-api-jonofoz.herokuapp.com/" },
-        { url: "http://simple-rest-api-jonofoz.herokuapp.com/" },
-        { url: "http://localhost:5000/" }
+        { url: "http://simple-rest-api-jonofoz.herokuapp.com/" }
       ],
     },
     apis: ["./routes/api.js"],
@@ -166,14 +176,18 @@ APIrouter.get('/read/:recordId', async (req, res, next) => {
  *               value2: 26.4
  *               value3: true
  *       "400":
- *         description: ID supplied was not valid
+ *         description: ID supplied to URI path wasn't valid, or the user tried to supply `_id` in the body
  *       "404":
  *         description: Record with that ID wasn't found
  */
 APIrouter.post('/create', async (req, res, next) => {
     try {
         const record = req.body;
-        record.creationDate = record.lastModificationDate = new Date().getTime();
+        // Users should not directly supply the record's _id field
+        if (record._id !== undefined) {
+            throw new Error(errorMessages['ID_WAS_SUPPLIED']);
+        }
+        record.lastModificationDate = record.creationDate = new Date().getTime();
         await req.collection.insertOne(record);
         console.log('Record created successfully.');
         res.status(201).json(record);
@@ -266,14 +280,13 @@ APIrouter.put('/modify/:recordId', async (req, res, next) => {
  *             schema:
  *               $ref: '#/components/schemas/Record'
  *       "400":
- *         description: ID supplied was not valid
+ *         description: ID supplied to URI path wasn't valid
  *       "404":
- *         description: Record with that ID wasn't found
+ *         description: No record with that ID was found
  */
 APIrouter.delete('/remove/:recordId', async (req, res, next) => {
     try {
         const recordId = req.params.recordId;
-        debugger;
         const deletedRecord = await req.collection.findOneAndDelete({ _id: ObjectID(recordId) }).then((result) => result.value);
         if (deletedRecord == null) {
             throw new Error(`No record with ID ${recordId} was found.`);
@@ -286,17 +299,21 @@ APIrouter.delete('/remove/:recordId', async (req, res, next) => {
     }
 })
 
+
 // Error handling middleware
 APIrouter.use((err, req, res, next) => {
 
     // The errors thrown by the MongoDB wrapper do not appear to include status codes.
     // Choose and send the appropriate code here, plus the included error message.
     const message = err.message;
+
     var status = 500;
-    if (message.includes("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters")) {
+    if (message.includes(errorMessages['ID_WAS_SUPPLIED']) ||
+        message.includes(errorMessages['MONGO_ID_INVALID']) ||
+        message.includes(errorMessages['MONGO_ID_MODIFICATION_ATTEMPT'])) {
         status = 400;
     }
-    else if (message.includes("No record with ID")) {
+    else if (message.includes(errorMessages['MONGO_ID_NOT_FOUND'])) {
         status = 404;
     }
     res.status(status).send({ err: err.message });
