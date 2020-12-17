@@ -13,17 +13,17 @@ app.use(express.json());
 
 var db, collection;
 
-router.get('/list', async (req, res) => {
+router.get('/list', async (req, res, next) => {
     try {
         const allRecords = await collection.find({}).toArray();
         console.log(`${allRecords.length} records fetched successfully.`);
         res.json(allRecords);
     }
     catch (err) {
-        res.send({ error: err.message });
+        next(err);
     }
 })
-router.post('/create', async (req, res) => {
+router.post('/create', async (req, res, next) => {
     try {
         const record = req.body;
         record.creationDate = record.lastModificationDate = new Date().getTime();
@@ -32,10 +32,10 @@ router.post('/create', async (req, res) => {
         res.status(201).json(record);
     }
     catch (err) {
-        res.send({ error: err.message })
+        next(err);
     }
 })
-router.get('/read/:recordId', async (req, res) => {
+router.get('/read/:recordId', async (req, res, next) => {
     try {
         const recordId = req.params.recordId;
         const record = await collection.findOne({ _id: ObjectID(recordId) });
@@ -46,10 +46,10 @@ router.get('/read/:recordId', async (req, res) => {
         res.json(record);
     }
     catch (err) {
-        res.send({ error: err.message });
+        next(err);
     }
 })
-router.put('/modify/:recordId', async (req, res) => {
+router.put('/modify/:recordId', async (req, res, next) => {
     try {
         const recordId = req.params.recordId;
         const fieldsToUpdate = req.body;
@@ -66,10 +66,10 @@ router.put('/modify/:recordId', async (req, res) => {
         res.json(record);
     }
     catch (err) {
-        res.send({ error: err.message });
+        next(err);
     }
 })
-router.delete('/remove/:recordId', async (req, res) => {
+router.delete('/remove/:recordId', async (req, res, next) => {
     try {
         const recordId = req.params.recordId;
         const deletedRecord = await collection.findOneAndDelete({ _id: ObjectID(recordId) }).then((result) => result.value);
@@ -80,11 +80,28 @@ router.delete('/remove/:recordId', async (req, res) => {
         res.json(deletedRecord);
     }
     catch (err) {
-        res.send({ error: err.message });
+        next(err);
     }
 })
 
 app.use('/api', router);
+
+// Error handling middleware
+app.use(async (err, req, res, next) => {
+
+    // The errors thrown by the MongoDB wrapper do not appear to include status codes,
+    // so we choose the appropriate ones here.
+    var status = 500;
+    const message = await err.message;
+    if (message.includes("Argument passed in must be a single String of 12 bytes or a string of 24 hex characters")) {
+        status = 400;
+    }
+    else if (message.includes("No record with ID")) {
+        status = 404;
+    }
+    res.status(status).send({ err: err.message });
+    next();
+})
 
 app.listen(PORT, () => {
     MongoClient.connect(URI, { useUnifiedTopology: true }, (err, client) => {
