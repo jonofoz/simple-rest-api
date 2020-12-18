@@ -153,6 +153,29 @@ APIrouter.get('/read/:recordId', async (req, res, next) => {
 
 /**
  * @swagger
+ * /api/recordsCount:
+ *     get:
+ *       tags:
+ *       - API
+ *       summary: Returns the number of records in the database
+ *       responses:
+ *         "200":
+ *           description: The number records of records was returned successfully
+ */
+APIrouter.get('/recordsCount', async (req, res, next) => {
+    try {
+        const recordsCount = await req.collection.countDocuments();
+        console.log(`Current records count: ${recordsCount}`);
+        res.json(recordsCount);
+    }
+    catch (err) {
+        next(err);
+    }
+})
+
+
+/**
+ * @swagger
  * /api/create:
  *   post:
  *     tags:
