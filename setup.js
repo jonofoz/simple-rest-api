@@ -1,52 +1,25 @@
-require('dotenv').config()
-const { ObjectID } = require('mongodb');
-const { MongoClient } = require('mongodb');
+/*
+    This is a little helper script that generates the data in ./starterData.js,
+    either in a test database or in the production database.
+*/
 
-const starterData = require('./starterData');
+require('dotenv').config()
+const { populateDBWithStarterData } = require('./utilities');
+
 const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017'
 
-const client = MongoClient(URI, {useUnifiedTopology: true});
-
-async function disconnectFromDB(exitStatus=null) {
-    try {
-        await client.close();
-    }
-    finally {
-        if (exitStatus == 1) {
-            process.exit(exitStatus);
-        }
-    }
+// Check correct usage of this utility from a CLI
+if (process.argv.length !== 3 || (process.argv[2] !== 'test' && process.argv[2] !== 'production')) {
+    throw new Error(
+        '\nIncorrect usage of "setupFor" to generate starterData.\n' +
+        'Here\'s how to use it: ' +
+        'npm run setupFor[test, production]"\n'
+    )
 }
+const testing = process.argv[2] === 'test'
+const DB_NAME         = testing ? process.env.DB_NAME_TEST         : process.env.DB_NAME_PRODUCTION;
+const COLLECTION_NAME = testing ? process.env.COLLECTION_NAME_TEST : process.env.COLLECTION_NAME_PRODUCTION;
 
-/**
- * This function places  basic starter data into the database for the REST API to work with. (Generated with Mockaroo.)
- */
-async function setupStarterData() {
-    try {
-        await client.connect();
-        const db = client.db('default');
-        const collection = db.collection('starterData')
-        // Remove the starterData collection if it already exists
-        await collection.deleteMany({})
-        // Populate the collection with the starterData
-        for await (let doc of starterData) {
-            try {
-                doc.lastModificationDate = doc.creationDate = new Date().getTime();
-                await collection.insertOne(doc);
-            }
-            catch (err) {
-                console.log(err)
-            }
-        };
-    }
-    catch (err) {
-        console.log(err);
-    }
-}
-
-setupStarterData()
-    .then(() => {
-        console.log("Starter data successfully added to the database!")
-    })
-    .finally(() => disconnectFromDB())
+populateDBWithStarterData(URI, DB_NAME, COLLECTION_NAME)
+    .then(() => console.log(`${COLLECTION_NAME} successfully populated in ${DB_NAME}!`))
     .catch(err => console.log(err.stack))
