@@ -1,4 +1,4 @@
-# tagup-challenge-rest-api
+# tagup-rest-api [![Build Status](https://travis-ci.com/jonofoz/songscaffolder.svg?branch=master)](https://travis-ci.com/jonofoz/simple-rest-api.svg?branch=master)
 
 ### Note: this repo is private.
 
@@ -21,11 +21,11 @@ Defaulting to MongoDB or Firebase until proven less ideal (if I can get answers 
 
 ### Endpoints:
 
-Since all endpoints begin with `/api`, I can factor that out of the equation.  
+Since all endpoints begin with `/api`, I can factor that out of the equation.
 
 #### Testing:
 
-In addition to the local DB, a small test DB should be created on the fly to prove the following tests: 
+In addition to the local DB, a small test DB should be created on the fly to prove the following tests:
 
 1. "Should list all records in the database"
     - There are N records in total
