@@ -1,11 +1,42 @@
 require('dotenv').config()
 
 const express = require('express');
+const mongoose = require('mongoose');
 const { MongoClient } = require('mongodb');
 const app = express();
 
 app.use(express.json());
 app.use(require("cors")({optionsSuccessStatus: 200}));
+
+
+// Swagger - documentation setup
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+
+const options = {
+    definition: {
+      openapi: "3.0.0",
+      info: {
+        title: "A Simple REST API",
+        description: "This is a simple REST API!",
+        version: "3.0.0"
+        },
+        externalDocs: {
+            description: "Documentation built with Swagger.",
+            url: "http://swagger.io"
+        },
+        // TODO: Determine which servers are available to execute API calls on, depending on where the documentation is hosted.
+      servers: [
+        { url: "http://localhost:5000/" },
+        { url: "https://simple-rest-api-jonofoz.herokuapp.com/" },
+        { url: "http://simple-rest-api-jonofoz.herokuapp.com/" }
+      ],
+    },
+    apis: ["./routes/api.js", "./recordSchema.js"],
+};
+
+const specs = swaggerJsdoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 const testing = process.env.NODE_ENV === "test";
 // Connect to MongoDB
@@ -16,20 +47,7 @@ const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017';
 
 app.set('port', PORT || 5000);
 
-var collection;
-const connection = MongoClient.connect(URI, { useUnifiedTopology: true }, (err, client) => {
-    if (err) {
-        throw err;
-    }
-    collection = client.db(DB_NAME).collection(COLLECTION_NAME);
-
-})
-
-app.use((req, res, next) => {
-    // Give the APIRouter middleware (directly below) access to the collection
-    req.collection = collection;
-    next();
-})
+mongoose.connect(`${URI}/${DB_NAME}`, { useNewUrlParser: true , useUnifiedTopology: true})
 
 app.use('/api', require('./routes/api'));
 

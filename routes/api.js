@@ -1,5 +1,7 @@
 const express = require('express');
-const { ObjectID } = require('mongodb');
+const { Schema, model, Types: {ObjectId} } = require('mongoose');
+const Record = require("../recordSchema");
+
 const APIrouter = express.Router();
 
 // Error messages: some custom, some from MongoDB
@@ -11,79 +13,6 @@ const errorMessages = {
     // 404
     MONGO_ID_NOT_FOUND: 'No record with ID'
 }
-
-// Swagger - documentation setup
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
-
-const options = {
-    definition: {
-      openapi: "3.0.0",
-      info: {
-        title: "A Simple REST API",
-        description: "This is a simple REST API!",
-        version: "3.0.0"
-        },
-        externalDocs: {
-            description: "Documentation built with Swagger.",
-            url: "http://swagger.io"
-        },
-        // TODO: Determine which servers are available to execute API calls on, depending on where the documentation is hosted.
-      servers: [
-        { url: "http://localhost:5000/" },
-        { url: "https://simple-rest-api-jonofoz.herokuapp.com/" },
-        { url: "http://simple-rest-api-jonofoz.herokuapp.com/" }
-      ],
-    },
-    apis: ["./routes/api.js"],
-};
-
-const specs = swaggerJsdoc(options);
-APIrouter.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(specs)
-);
-
-// Swagger - components setup
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Record:
- *       type: object
- *       properties:
- *         _id:
- *           description: The 12 byte, hexademical representation of an automatically-generated MongoDB ObjectId
- *           type: string
- *           format: byte
- *           example: '999999999999999999999999'
- *         timestamp:
- *           description: The unix time, in milliseconds, that the record was created
- *           type: integer
- *           example: 1578031200000
- *         value1:
- *           description: A string (does not have to be a name)
- *           type: string
- *           example: Lowe Pannaman
- *         value2:
- *           type: number
- *           format: float
- *           example: 46.3
- *         value3:
- *           type: boolean
- *           example: false
- *         creationDate:
- *           description: The unix timestamp, in milliseconds, that the record was first saved to the database
- *           type: integer
- *           example: 1608239798195
- *         lastModificationDate:
- *           description: The unix timestamp, in milliseconds, of the last time the record was modified
- *           type: integer
- *           example: 1608239798195
- */
-
 /**
  * @swagger
  * /api/list:
@@ -98,7 +27,7 @@ APIrouter.use(
  */
 APIrouter.get('/list', async (req, res, next) => {
     try {
-        const allRecords = await req.collection.find({}).toArray();
+        const allRecords = await Record.find({})
         console.log(`${allRecords.length} records fetched successfully.`);
         res.json(allRecords);
     }
@@ -139,7 +68,7 @@ APIrouter.get('/list', async (req, res, next) => {
 APIrouter.get('/read/:recordId', async (req, res, next) => {
     try {
         const recordId = req.params.recordId;
-        const record = await req.collection.findOne({ _id: ObjectID(recordId) });
+        const record = await Record.findOne({ _id: ObjectId(recordId) });
         if (record == null) {
             throw new Error(`No record with ID ${recordId} was found.`);
         }
@@ -164,7 +93,7 @@ APIrouter.get('/read/:recordId', async (req, res, next) => {
  */
 APIrouter.get('/recordsCount', async (req, res, next) => {
     try {
-        const recordsCount = await req.collection.countDocuments();
+        const recordsCount = await Record.countDocuments();
         console.log(`Current records count: ${recordsCount}`);
         res.json(recordsCount);
     }
@@ -172,7 +101,6 @@ APIrouter.get('/recordsCount', async (req, res, next) => {
         next(err);
     }
 })
-
 
 /**
  * @swagger
@@ -206,15 +134,17 @@ APIrouter.get('/recordsCount', async (req, res, next) => {
  */
 APIrouter.post('/create', async (req, res, next) => {
     try {
-        const record = req.body;
+        var requestBody = req.body;
         // Users should not directly supply the record's _id field
-        if (record._id !== undefined) {
+        if (requestBody._id !== undefined) {
             throw new Error(errorMessages['ID_WAS_SUPPLIED']);
         }
-        record.lastModificationDate = record.creationDate = new Date().getTime();
-        await req.collection.insertOne(record);
+        requestBody._id = new ObjectId();
+        requestBody.lastModificationDate = requestBody.creationDate = new Date().getTime();
+        const newRecord = Record(requestBody)
+        newRecord.save()
         console.log('Record created successfully.');
-        res.status(201).json(record);
+        res.status(201).json(newRecord);
     }
     catch (err) {
         next(err);
@@ -264,16 +194,17 @@ APIrouter.put('/modify/:recordId', async (req, res, next) => {
         const recordId = req.params.recordId;
         const fieldsToUpdate = req.body;
         fieldsToUpdate.lastModificationDate = new Date().getTime();
-        const record = await req.collection.findOneAndUpdate(
-            { _id: ObjectID(recordId) },
-            { $set: fieldsToUpdate },
-            { returnOriginal: false }
-        ).then(result => result.value)
-        if (record == null) {
+        const recordToModify = await Record.findByIdAndUpdate(
+            recordId,
+            fieldsToUpdate,
+            {new: true}
+        )
+        recordToModify.save()
+        if (recordToModify == null) {
             throw new Error(`No record with ID ${recordId} was found.`);
         }
         console.log(`Record ${recordId} updated successfully.`);
-        res.json(record);
+        res.json(recordToModify);
     }
     catch (err) {
         next(err);
@@ -311,7 +242,7 @@ APIrouter.put('/modify/:recordId', async (req, res, next) => {
 APIrouter.delete('/remove/:recordId', async (req, res, next) => {
     try {
         const recordId = req.params.recordId;
-        const deletedRecord = await req.collection.findOneAndDelete({ _id: ObjectID(recordId) }).then((result) => result.value);
+        const deletedRecord = await Record.findByIdAndDelete(recordId);
         if (deletedRecord == null) {
             throw new Error(`No record with ID ${recordId} was found.`);
         }
