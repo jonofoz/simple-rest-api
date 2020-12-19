@@ -1,8 +1,10 @@
 require('dotenv').config()
-const baseURL = process.env.BASE_URL || 'http://127.0.0.1:5000';
 const request = require('supertest');
+const mongoose = require('mongoose');
+const { Schema, model, Types: { ObjectId } } = mongoose;
 
 const { populateDBWithStarterData, clearDBData } = require('../utilities');
+const Record = require("../recordSchema");
 
 const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017'
 
@@ -11,12 +13,24 @@ const COLLECTION_NAME = process.env.COLLECTION_NAME_TEST;
 
 var app;
 
-beforeAll(() => {
-    const baseURL = process.env.BASE_URL || 'http://127.0.0.1:5000';
+beforeAll(async () => {
+    const fullURI = `${URI}/${DB_NAME}`;
+    await mongoose.connect(fullURI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+    mongoose.connection.on('connected', () => {
+        console.log(`+ Connected to ${fullURI}`)
+    })
     app = require('../app');
 })
 
+afterAll(async () => {
+    await mongoose.connection.close()
+    mongoose.connection.on('disconnected', () => {
+        console.log(`- Disconnected from ${fullURI}`)
+    })
+})
+
 beforeEach(async () => {
+    console.log("--> NEW TEST")
     await populateDBWithStarterData(URI, DB_NAME, COLLECTION_NAME)
         .then(() => console.log("Test data successfully added to the database!"))
         .catch(err => console.log(err.stack))
@@ -35,9 +49,16 @@ async function getNumberOfRecords() {
         .then(res => res.body);
 }
 
-describe("GET / ", () => {
+// This helper function just prints the name of the Jest test being run.
+// Since the tests are currently run silently, this is only for debugging.
+function consoleLogCurrentTestName(expect) {
+    console.log(`--> '${expect.getState().currentTestName}'`)
+}
+
+describe('GET /', () => {
     test('Should list all records in the database', async () => {
         // There should 10 records returned
+        consoleLogCurrentTestName(expect);
         expect.assertions(1);
         const records = await request(app)
             .get('/api/list')
@@ -49,6 +70,7 @@ describe("GET / ", () => {
 
     test('Should fetch a record from the database', async () => {
         // Should get Lowe Pannaman and any expected values
+        consoleLogCurrentTestName(expect);
         expect.assertions(4);
         const record = await request(app)
             .get('/api/read/999999999999999999999999')
@@ -63,12 +85,13 @@ describe("GET / ", () => {
 
     test('Should fetch the number of records in the database', async () => {
         // Should return 10
+        consoleLogCurrentTestName(expect);
         expect.assertions(1);
         expect(await getNumberOfRecords()).toEqual(10);
     })
 })
 
-describe('POST / ', () => {
+describe('POST /', () => {
     test('Should create a new record in the database', async () => {
         /*
             Before creation:
@@ -79,6 +102,7 @@ describe('POST / ', () => {
                 There should be 11 records
                 Record should not have been in the database before creation
         */
+        consoleLogCurrentTestName(expect);
         expect.assertions(7);
 
         // Before creation:
@@ -119,7 +143,7 @@ describe('POST / ', () => {
     })
 })
 
-describe('PUT / ', () => {
+describe('PUT /', () => {
     test('Should modify a record in the database', async () => {
         /*
             Before modification:
@@ -130,7 +154,7 @@ describe('PUT / ', () => {
                 Record should have any expected values
                 There should still be 10 records
         */
-
+        consoleLogCurrentTestName(expect);
         expect.assertions(10);
 
         // Before modification:
@@ -172,7 +196,7 @@ describe('PUT / ', () => {
     })
 })
 
-describe('DELETE / ', () => {
+describe('DELETE /', () => {
     test('Should remove a record from the database', async () => {
         /*
             Before removal:
@@ -183,6 +207,7 @@ describe('DELETE / ', () => {
                 There should be 9 records
                 Record should not be in the database after removal
         */
+        consoleLogCurrentTestName(expect);
         expect.assertions(7);
 
         // Before removal:
@@ -215,4 +240,3 @@ describe('DELETE / ', () => {
         expect(deletedRecordIstStillThere).toBeFalsy();
     })
 })
-

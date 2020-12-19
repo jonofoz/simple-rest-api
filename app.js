@@ -47,14 +47,13 @@ const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017';
 
 app.set('port', PORT || 5000);
 
-mongoose.connect(`${URI}/${DB_NAME}`, { useNewUrlParser: true , useUnifiedTopology: true})
+mongoose.connect(`${URI}/${DB_NAME}`, { useNewUrlParser: true , useUnifiedTopology: true,  useFindAndModify: false})
 
 app.use('/api', require('./routes/api'));
 
 /*
-    SuperTest handles the opening and closing of a test instance of app.
-    We don't call listen() manually in test: we could potentially create
-    orphan processes if we don't close them before tests finish.
+    SuperTest handles the opening and closing of a test instance of app,
+    so we don't call listen() in that case.
 */
 
 if (!testing) {

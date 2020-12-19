@@ -7,7 +7,7 @@
     "start": "node app.js",
     "setupFor": "node setup.js",
     "dev": "nodemon app.js",
-    "test": "node_modules/.bin/jest ./tests --detectOpenHandles --force-exit"
+    "test": "node_modules/.bin/jest ./tests --runInBand --silent"
   },
   "repository": {
     "type": "git",
