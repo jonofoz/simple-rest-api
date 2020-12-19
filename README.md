@@ -1,4 +1,4 @@
-# tagup-rest-api [![Build Status](https://travis-ci.com/jonofoz/songscaffolder.svg?branch=master)](https://travis-ci.com/jonofoz/simple-rest-api.svg?branch=master)
+# tagup-rest-api [![Build Status](https://travis-ci.com/jonofoz/tagup-rest-api.svg?token=o3itZ4YG7Vp8DyLad8P4&branch=master)](https://travis-ci.com/jonofoz/tagup-rest-api)
 
 ### Note: this repo is private.
 
