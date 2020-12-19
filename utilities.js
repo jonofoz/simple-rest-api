@@ -1,27 +1,36 @@
 
-const  mongoose = require('mongoose');
+require('dotenv').config();
+const mongoose = require('mongoose');
 
 const Record = require('./recordSchema');
 const starterData = require('./starterData');
 
+const testing = process.env.NODE_ENV === "test";
+
 async function clearDBData(URI, dbName, collectionName) {
     try {
-        await mongoose.connect(`${URI}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
-        mongoose.connection.db.dropDatabase()
+        if (!testing) {
+            await mongoose.connect(`${URI}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+        }
+        await Record.deleteMany({});
     }
     catch (err) {
         throw new Error(err);
     }
     finally {
-        mongoose.connection.close()
+        if (!testing) {
+            mongoose.connection.close()
+        }
     }
 }
 
 async function populateDBWithStarterData(URI, dbName, collectionName) {
     try {
-        await mongoose.connect(`${URI}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+        if (!testing) {
+            await mongoose.connect(`${URI}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+        }
         // First, remove everything from the database
-        mongoose.connection.db.dropDatabase()
+        await Record.deleteMany({});
         // Populate the collection with the starterData
         for await (var record of starterData) {
             try {
@@ -39,7 +48,9 @@ async function populateDBWithStarterData(URI, dbName, collectionName) {
         throw new Error(err);
     }
     finally {
-        mongoose.connection.close()
+        if (!testing) {
+            mongoose.connection.close()
+        }
     }
 }
 
