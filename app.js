@@ -13,6 +13,25 @@ app.use(require("cors")({optionsSuccessStatus: 200}));
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
+
+const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017'
+const testing = process.env.NODE_ENV === "test";
+// Connect to MongoDB
+const PORT = testing ? 3333 : process.env.PORT;
+const DB_NAME         = testing ? process.env.DB_NAME_TEST         : process.env.DB_NAME_PRODUCTION;
+const COLLECTION_NAME = testing ? process.env.COLLECTION_NAME_TEST : process.env.COLLECTION_NAME_PRODUCTION;
+
+app.set('port', PORT || 5000);
+// These are the available servers to run tests on.
+const servers = [
+    { url: "https://simple-rest-api-jonofoz.herokuapp.com/" },
+    { url: "http://simple-rest-api-jonofoz.herokuapp.com/" }
+]
+// If we have a local instance of MongoDB to connect to, add that option to front of the array.
+if (URI.includes('localhost') || URI.includes('127.0.0.1')) {
+    servers.unshift({ url: `http://localhost:${app.get('port')}/` })
+}
+
 const options = {
     definition: {
       openapi: "3.0.0",
@@ -26,26 +45,13 @@ const options = {
             url: "http://swagger.io"
         },
         // TODO: Determine which servers are available to execute API calls on, depending on where the documentation is hosted.
-      servers: [
-        { url: "http://localhost:5000/" },
-        { url: "https://simple-rest-api-jonofoz.herokuapp.com/" },
-        { url: "http://simple-rest-api-jonofoz.herokuapp.com/" }
-      ],
+      servers
     },
     apis: ["./routes/api.js", "./recordSchema.js"],
 };
 
 const specs = swaggerJsdoc(options);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
-
-const testing = process.env.NODE_ENV === "test";
-// Connect to MongoDB
-const PORT = testing ? 3333 : process.env.PORT;
-const DB_NAME         = testing ? process.env.DB_NAME_TEST         : process.env.DB_NAME_PRODUCTION;
-const COLLECTION_NAME = testing ? process.env.COLLECTION_NAME_TEST : process.env.COLLECTION_NAME_PRODUCTION;
-const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017';
-
-app.set('port', PORT || 5000);
 
 mongoose.connect(`${URI}/${DB_NAME}`, { useNewUrlParser: true , useUnifiedTopology: true,  useFindAndModify: false})
 
