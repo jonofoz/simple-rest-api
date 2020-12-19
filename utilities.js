@@ -1,35 +1,34 @@
-const { MongoClient } = require('mongodb');
 
+const  mongoose = require('mongoose');
+
+const Record = require('./recordSchema');
 const starterData = require('./starterData');
 
 async function clearDBData(URI, dbName, collectionName) {
-    const client = MongoClient(URI, {useUnifiedTopology: true});
     try {
-        await client.connect();
-        const collection = client.db(dbName).collection(collectionName)
-        // Remove everything from the database
-        await collection.deleteMany({})
+        await mongoose.connect(`${URI}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+        mongoose.connection.db.dropDatabase()
     }
     catch (err) {
-        console.log(err);
+        throw new Error(err);
     }
     finally {
-        client.close()
+        mongoose.connection.close()
     }
 }
 
 async function populateDBWithStarterData(URI, dbName, collectionName) {
-    const client = MongoClient(URI, {useUnifiedTopology: true});
     try {
-        await client.connect();
-        const collection = client.db(dbName).collection(collectionName)
-        // Remove everything from the database
-        await collection.deleteMany({})
+        await mongoose.connect(`${URI}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+        // First, remove everything from the database
+        mongoose.connection.db.dropDatabase()
         // Populate the collection with the starterData
-        for await (var doc of starterData) {
+        for await (var record of starterData) {
             try {
-                doc.lastModificationDate = doc.creationDate = new Date().getTime();
-                await collection.insertOne(doc);
+                record.lastModificationDate = record.creationDate = new Date().getTime();
+                const newRecord = Record(record)
+                await newRecord.save()
+                console.log('Record created successfully.');
             }
             catch (err) {
                 console.log(err)
@@ -37,10 +36,10 @@ async function populateDBWithStarterData(URI, dbName, collectionName) {
         };
     }
     catch (err) {
-        console.log(err);
+        throw new Error(err);
     }
     finally {
-        client.close()
+        mongoose.connection.close()
     }
 }
 

@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const { Schema, model } = require('mongoose');
 
 /**
@@ -39,12 +37,6 @@ const { Schema, model } = require('mongoose');
  *           example: 1608239798195
  */
 
-const {
-    NODE_ENV,
-    COLLECTION_NAME_TEST,
-    COLLECTION_NAME_PRODUCTION
-} = process.env;
-
 const recordSchema = new Schema(
     {
         _id: { type: Schema.Types.ObjectId, required: false },
@@ -57,7 +49,6 @@ const recordSchema = new Schema(
     },
     {
         versionKey: false,
-        collection: NODE_ENV === 'test' ? COLLECTION_NAME_TEST : COLLECTION_NAME_PRODUCTION
     }
 );
 

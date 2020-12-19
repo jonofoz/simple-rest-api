@@ -18,8 +18,7 @@ if (process.argv.length !== 3 || (process.argv[2] !== 'test' && process.argv[2] 
 }
 const testing = process.argv[2] === 'test'
 const DB_NAME         = testing ? process.env.DB_NAME_TEST         : process.env.DB_NAME_PRODUCTION;
-const COLLECTION_NAME = testing ? process.env.COLLECTION_NAME_TEST : process.env.COLLECTION_NAME_PRODUCTION;
 
-populateDBWithStarterData(URI, DB_NAME, COLLECTION_NAME)
-    .then(() => console.log(`${COLLECTION_NAME} successfully populated in ${DB_NAME}!`))
+populateDBWithStarterData(URI, DB_NAME)
+    .then(() => console.log(`Sstarter data successfully populated in ${DB_NAME}!`))
     .catch(err => console.log(err.stack))

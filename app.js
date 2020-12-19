@@ -2,7 +2,6 @@ require('dotenv').config()
 
 const express = require('express');
 const mongoose = require('mongoose');
-const { MongoClient } = require('mongodb');
 const app = express();
 
 app.use(express.json());
@@ -19,7 +18,6 @@ const testing = process.env.NODE_ENV === "test";
 // Connect to MongoDB
 const PORT = testing ? 3333 : process.env.PORT;
 const DB_NAME         = testing ? process.env.DB_NAME_TEST         : process.env.DB_NAME_PRODUCTION;
-const COLLECTION_NAME = testing ? process.env.COLLECTION_NAME_TEST : process.env.COLLECTION_NAME_PRODUCTION;
 
 app.set('port', PORT || 5000);
 // These are the available servers to run tests on.

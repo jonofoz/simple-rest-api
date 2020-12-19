@@ -9,7 +9,6 @@ const Record = require("../recordSchema");
 const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017'
 
 const DB_NAME = process.env.DB_NAME_TEST;
-const COLLECTION_NAME = process.env.COLLECTION_NAME_TEST;
 
 var app;
 
@@ -31,12 +30,12 @@ afterAll(async () => {
 
 beforeEach(async () => {
     console.log("--> NEW TEST")
-    await populateDBWithStarterData(URI, DB_NAME, COLLECTION_NAME)
+    await populateDBWithStarterData(URI, DB_NAME)
         .then(() => console.log("Test data successfully added to the database!"))
         .catch(err => console.log(err.stack))
 })
 afterEach(async () => {
-    await clearDBData(URI, DB_NAME, COLLECTION_NAME)
+    await clearDBData(URI, DB_NAME)
         .then(() => console.log("Test data successfully cleared from the database!"))
         .catch(err => console.log(err.stack))
 })
