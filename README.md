@@ -5,9 +5,7 @@ tagup-rest-api [![Build Status](https://travis-ci.com/jonofoz/tagup-rest-api.svg
 
 This is a simple REST API that performs basic CRUD operations on some fake data!
 
-If you don't want to clone the project yet, you can play with [this deployed version first](https://simple-rest-api-jonofoz.herokuapp.com/api-docs/#/) and test the API there from the SwaggerUI docs. If you're confused as to how to try out the API there, check out my [super quick (< 1 minute) guide](#link-to-guide) to dive in.
-
-
+If you don't want to clone the project yet, you can play with [this deployed version first](https://simple-rest-api-jonofoz.herokuapp.com/api-docs/#/) and test the API there from the SwaggerUI docs.
 
 Before You Install
 ------------------
@@ -30,10 +28,19 @@ Installation
 6. Navigate to `http://localhost:5000/api-docs`.
 7. Have fun!
 
-Again, if you need help with the SwaggerUI docs, [here's my quick guide](#link-to-guide).
+Navigating the Repo
+-------------------
+- `app.js`: Where the Express server launches, where the API is mounted, and where the Swagger docs are generated.
+- `dbUtils.js`: Contains convenience functions for database manipulation, such as populating the database with starter data, or clearing out a collection.
+- `docsSpecs.js`: Contains specifications for the Swagger docs metadata, which files to grab fragments of documentation from, and which servers are available for trying out the API on.
+- `recordSchema.js`: Contains the schema definition for records in a collection and exports it as a Mongoose model.
+- `routes/api.js`: Contains an Express router with the API endpoints.
+- `sample.env`: Contains samples of environment variables used throughout the app. Rename to `.env` to use them.
+- `setup.js`: Contains logic for setting up DB collections with starter data. Called with `npm run setupFor [test, production]`.
+- `starterData.js`: Contains 10 records of interesting example data, generated mostly with [Mockaroo](https://www.mockaroo.com/).
+- `tests/api.test.js`: Tests every endpoint of the API using [Jest](https://jestjs.io/). Runs in series, since the tests don't take very long apiece.
 
 Problems or Questions?
 ----------------------
 Let me know!
 jon@jonofoz.com
-
