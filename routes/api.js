@@ -135,7 +135,7 @@ APIrouter.get('/recordsCount', async (req, res, next) => {
 APIrouter.post('/create', async (req, res, next) => {
     try {
         var requestBody = req.body;
-        // Users should not directly supply the record's _id field
+        // Users should not directly supply the record's _id field.
         if (requestBody._id !== undefined) {
             throw new Error(errorMessages['ID_WAS_SUPPLIED']);
         }
@@ -193,6 +193,9 @@ APIrouter.put('/modify/:recordId', async (req, res, next) => {
     try {
         const recordId = req.params.recordId;
         const fieldsToUpdate = req.body;
+        if (fieldsToUpdate._id !== undefined) {
+            throw new Error(errorMessages['ID_WAS_SUPPLIED']);
+        }
         fieldsToUpdate.lastModificationDate = new Date().getTime();
         const recordToModify = await Record.findByIdAndUpdate(
             recordId,
@@ -258,10 +261,12 @@ APIrouter.delete('/remove/:recordId', async (req, res, next) => {
 // Error handling middleware
 APIrouter.use((err, req, res, next) => {
 
-    // The errors thrown by the MongoDB wrapper do not appear to include status codes.
-    // Choose and send the appropriate code here, plus the included error message.
+    /*
+        IIUC, MongoDB throws different kinds of errors with corresponding status codes,
+        but I haven't caught anything more than a message. So, until I figure that out,
+        this middleware will have to suffice.
+    */
     const message = err.message;
-
     var status = 500;
     if (message.includes(errorMessages['ID_WAS_SUPPLIED']) ||
         message.includes(errorMessages['MONGO_ID_INVALID']) ||
@@ -271,7 +276,7 @@ APIrouter.use((err, req, res, next) => {
     else if (message.includes(errorMessages['MONGO_ID_NOT_FOUND'])) {
         status = 404;
     }
-    res.status(status).send(err.message);
+    res.status(status).send({ error: message });
     next();
 })
 

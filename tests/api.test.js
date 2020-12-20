@@ -81,6 +81,18 @@ describe('GET /', () => {
         expect(record.value3).toEqual(false);
     })
 
+    test('Should return 404 when a record isn\'t found', async () => {
+        // Should get Lowe Pannaman and any expected values
+        consoleLogCurrentTestName(expect);
+        expect.assertions(1);
+        const error = await request(app)
+            .get('/api/read/ad38bcc792bccc4ab5e2464a')
+            .expect(404)
+            .expect('Content-Type', /json/)
+            .then(res => res.body.error)
+        expect(error).toEqual('No record with ID ad38bcc792bccc4ab5e2464a was found.');
+    })
+
     test('Should fetch the number of records in the database', async () => {
         // Should return 10
         consoleLogCurrentTestName(expect);
@@ -139,6 +151,20 @@ describe('POST /', () => {
         const newRecordWasAlreadyThere = recordsOld.filter(rec => rec._id === newRecord._id).length > 0;
         expect(newRecordWasAlreadyThere).toBeFalsy();
     })
+
+    test('Should return 400 when _id is supplied', async () => {
+        consoleLogCurrentTestName(expect);
+        expect.assertions(1);
+
+        const error = await request(app)
+            .post('/api/create')
+            .send({'_id': '111111111111111111'})
+            .set('Accept', 'application/json')
+            .expect(400)
+            .expect('Content-Type', /json/)
+            .then(res => res.body.error);
+        expect(error).toEqual('Supplying the _id field is not allowed');
+    })
 })
 
 describe('PUT /', () => {
@@ -191,6 +217,20 @@ describe('PUT /', () => {
         expect(modifiedRecord.value3).toEqual(requestBody['value3']);
 
         expect(await getNumberOfRecords()).toEqual(10);
+    })
+
+    test('Should return 400 when _id is supplied', async () => {
+        consoleLogCurrentTestName(expect);
+        expect.assertions(1);
+
+        const error = await request(app)
+            .post('/api/create')
+            .send({'_id': '111111111111111111'})
+            .set('Accept', 'application/json')
+            .expect(400)
+            .expect('Content-Type', /json/)
+            .then(res => res.body.error);
+        expect(error).toEqual('Supplying the _id field is not allowed');
     })
 })
 
