@@ -1,51 +1,39 @@
-# tagup-rest-api [![Build Status](https://travis-ci.com/jonofoz/tagup-rest-api.svg?token=o3itZ4YG7Vp8DyLad8P4&branch=master)](https://travis-ci.com/jonofoz/tagup-rest-api)
 
-### Note: this repo is private.
 
-For convenience, the challenge docs can be found [here](https://github.com/tagup/challenges/tree/master/backend).
+tagup-rest-api [![Build Status](https://travis-ci.com/jonofoz/tagup-rest-api.svg?token=o3itZ4YG7Vp8DyLad8P4&branch=master)](https://travis-ci.com/jonofoz/tagup-rest-api)
+==============
 
----
+This is a simple REST API that performs basic CRUD operations on some fake data!
 
-#### Questions So Far:
+If you don't want to clone the project yet, you can play with [this deployed version first](https://simple-rest-api-jonofoz.herokuapp.com/api-docs/#/) and test the API there from the SwaggerUI docs. If you're confused as to how to test the app there, check out my [super quick (< 1 minute) guide](#link-to-guide) to dive in.
 
-**First, basic questions.**
-- Do new entries to the database require schema validation (i.e. making sure value1 *is* a string)?
 
-**And then—with an understanding that this is just an exercise—questions about which database to choose.**
-- Does the schema need to flexible to account for future changes, or is it fixed?
-- Who is coming behind me to add onto my code, and what's their experience?
-- Will complex queries be performed frequently on the data?
-- How much larger will the data be in 5-10 years?
 
-Defaulting to MongoDB or Firebase until proven less ideal (if I can get answers to the DB-specific questions).
+Before You Install
+------------------
+- You should have MongoDB installed locally; if you don't, download it [here.](https://www.mongodb.com/try/download/community) 
+- The default URI for connecting to MongoDB with is `mongodb://127.0.0.1:27017`: if that's not the case for you, you will need to rename the `sample.env` file to `.env` after you've cloned to app, then fix the `MONGO_URI` variable to suit your needs.
 
-### Endpoints:
+Installation
+------------
+(I'll assume you already know how to use at least one CLI, like Bash, PowerShell, etc.)
 
-Since all endpoints begin with `/api`, I can factor that out of the equation.
+1. Clone the app.
+`git clone https://github.com/jonofoz/tagup-rest-api.git`
+2. Change into the new `tagup-rest-api` directory.
+3. Enter `npm install` and wait for the installation to complete.
+4. Run the following command(s) to populate MongoDB with the starter data:
+    - For production, `npm run setupFor production`.
+    - For test, `npm run setupFor test`.
+5. Enter `npm start`. 
+    - The API should start on `http://localhost:5000`: if the 5000 port is already in use, kill the app, change the `PORT` variable in a `.env` file to a free port, then restart the app.
+6. Navigate to `http://localhost:5000/api-docs`.
+7. Have fun!
 
-#### Testing:
+Again, if you need help with the SwaggerUI docs, [here's my quick guide](#link-to-guide).
 
-In addition to the local DB, a small test DB should be created on the fly to prove the following tests:
+Problems or Questions?
+----------------------
+Let me know!
+jon@jonofoz.com
 
-1. "Should list all records in the database"
-    - There are N records in total
-    - The records are in a predictable order
-2. "Should fetch a record from the database
-    - The values of the record are as expected
-3. "Should create a new record in the database"
-    - There are N records before new record creation
-    - There are N + 1 records after new record creation
-    - The database doesn't contain the record before its creation
-    - The database contains the record after its creation
-    - The record is created and the status is 201
-    - (If schema-validated) The new record will not be created if there is a schema mismatch and an error will be thrown
-4. "Should update an existing record's values in the database"
-    - The values of the record are as expected before modification
-    - The values of the record are different after modification
-    - There are N records in total before and after modification
-5. "Should remove a record from the database"
-    - There are N records before record deletion
-    - There are N - 1 records after new record deletion
-    - The database contains the record before its deletion
-    - The database doesn't contain the record after its deletion
-    - The record is deleted and the status is 200
