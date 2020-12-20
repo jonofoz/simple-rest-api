@@ -3,17 +3,16 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const { Schema, model, Types: { ObjectId } } = mongoose;
 
-const { populateDBWithStarterData, clearDBData } = require('../utilities');
+const { populateDBWithStarterData, clearRecordsInDB } = require('../dbUtils');
 const Record = require("../recordSchema");
 
 const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017'
-
-const DB_NAME = process.env.DB_NAME_TEST;
+const DB = process.env.DB_NAME_TEST || 'testDB';
 
 var app;
 
 beforeAll(async () => {
-    const fullURI = `${URI}/${DB_NAME}`;
+    const fullURI = `${URI}/${DB}`;
     await mongoose.connect(fullURI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
     mongoose.connection.on('connected', () => {
         console.log(`+ Connected to ${fullURI}`)
@@ -30,12 +29,12 @@ afterAll(async () => {
 
 beforeEach(async () => {
     console.log("--> NEW TEST")
-    await populateDBWithStarterData(URI, DB_NAME)
+    await populateDBWithStarterData(URI, DB)
         .then(() => console.log("Test data successfully added to the database!"))
         .catch(err => console.log(err.stack))
 })
 afterEach(async () => {
-    await clearDBData(URI, DB_NAME)
+    await clearRecordsInDB(URI, DB)
         .then(() => console.log("Test data successfully cleared from the database!"))
         .catch(err => console.log(err.stack))
 })

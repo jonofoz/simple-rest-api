@@ -271,7 +271,7 @@ APIrouter.use((err, req, res, next) => {
     else if (message.includes(errorMessages['MONGO_ID_NOT_FOUND'])) {
         status = 404;
     }
-    res.status(status).send({ err: err.message });
+    res.status(status).send(err.message);
     next();
 })
 

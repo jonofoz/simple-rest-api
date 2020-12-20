@@ -1,10 +1,10 @@
 /*
     This is a little helper script that generates the data in ./starterData.js,
-    either in a test database or in the production database.
+    either in the test database or in the production database.
 */
 
 require('dotenv').config()
-const { populateDBWithStarterData } = require('./utilities');
+const { populateDBWithStarterData } = require('./dbUtils');
 
 const URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017'
 
@@ -17,8 +17,9 @@ if (process.argv.length !== 3 || (process.argv[2] !== 'test' && process.argv[2] 
     )
 }
 const testing = process.argv[2] === 'test'
-const DB_NAME = testing ? process.env.DB_NAME_TEST : process.env.DB_NAME_PRODUCTION;
-
-populateDBWithStarterData(URI, DB_NAME)
-    .then(() => console.log(`Starter data successfully populated in ${DB_NAME}!`))
+const DB_NAME_TEST       = process.env.DB_NAME_TEST       || 'testDB';
+const DB_NAME_PRODUCTION = process.env.DB_NAME_PRODUCTION || 'productionDB';
+const DB = testing ? DB_NAME_TEST : DB_NAME_PRODUCTION;
+populateDBWithStarterData(URI, DB)
+    .then(() => console.log(`Starter data successfully populated in ${DB}!`))
     .catch(err => console.log(err.stack))

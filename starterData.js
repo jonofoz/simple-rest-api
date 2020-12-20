@@ -1,7 +1,7 @@
 /*
   Please note: the _id fields are not allowed to be set via the API.
   These _id's are assigned only as a convenience for testing, and these
-  records are not inserted in ./setup.js via the API.
+  records are never inserted using the API.
 */
 
 const { ObjectID } = require("mongodb");
