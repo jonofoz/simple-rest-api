@@ -10,30 +10,30 @@ const testing = process.env.NODE_ENV === "test";
 
 // Connects to DB (if not testing) and removes all records from a database collection.
 async function removeRecords(URI, dbName) {
-    if (!testing) mongoose.connect(`${URI}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
+    if (!testing) await mongoose.connect(`${URI}/${dbName}`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
     await Record.deleteMany({});
 }
 
 // Disconnects from DB (if not testing).
-function closeConnection(URI, dbName) {
-    if (!testing) mongoose.connection.close()
+async function closeConnection(URI, dbName) {
+    if (!testing) await mongoose.connection.close()
 }
 
 async function clearRecordsInDB(URI, dbName) {
     try {
-        removeRecords(URI, dbName);
+        await removeRecords(URI, dbName);
     }
     catch (err) {
         throw new Error(err);
     }
     finally {
-        closeConnection();
+        await closeConnection();
     }
 }
 
 async function populateDBWithStarterData(URI, dbName) {
     try {
-        removeRecords(URI, dbName);
+        await removeRecords(URI, dbName);
 
         for await (var record of starterData) {
             record.lastModificationDate = record.creationDate = new Date().getTime();
@@ -46,7 +46,7 @@ async function populateDBWithStarterData(URI, dbName) {
         throw new Error(err);
     }
     finally {
-        closeConnection();
+        await closeConnection();
     }
 }
 

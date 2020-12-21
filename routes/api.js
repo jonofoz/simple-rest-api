@@ -109,6 +109,7 @@ APIrouter.get('/recordsCount', async (req, res, next) => {
  *     tags:
  *     - API
  *     summary: Add a new record to the database
+ *     description: The user provides the request body and the new record will be returned as a JSON object. See example below.
  *     requestBody:
  *       description: Any combination of the fields—except for `_id`—can be specified. If the field did not already exist in the record, it will be added.
  *       content:
@@ -158,6 +159,7 @@ APIrouter.post('/create', async (req, res, next) => {
  *     tags:
  *     - API
  *     summary: Update a record in the database
+ *     description: The user provides the request body and the modified record will be returned as a JSON object. See example below.
  *     parameters:
  *     - name: recordId
  *       in: path
@@ -221,6 +223,7 @@ APIrouter.put('/modify/:recordId', async (req, res, next) => {
  *     tags:
  *     - API
  *     summary: Delete record in the database
+ *     description: The deleted record will be returned as a JSON object. See example below.
  *     parameters:
  *     - name: recordId
  *       in: path
@@ -260,7 +263,6 @@ APIrouter.delete('/remove/:recordId', async (req, res, next) => {
 
 // Error handling middleware
 APIrouter.use((err, req, res, next) => {
-
     /*
         IIUC, MongoDB throws different kinds of errors with corresponding status codes,
         but I haven't caught anything more than a message. So, until I figure that out,

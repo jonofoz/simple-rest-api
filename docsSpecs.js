@@ -14,8 +14,8 @@ function getDocsSpecs(port) {
   ]
   /*
     In short, the below conditional checks if the user can run the REST API on a
-    local MongoDB server from the SwaggerUI docs: if so, we add the local server
-    as the first option in the array of servers.
+    local MongoDB server from the SwaggerUI docs: if so, the local server is
+    added as the first option in the array of servers.
 
     Conditions:
     - The MONGO_URI looks like it's meant to connect to a local server
