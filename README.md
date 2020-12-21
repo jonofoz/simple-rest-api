@@ -5,7 +5,7 @@ tagup-rest-api [![Build Status](https://travis-ci.com/jonofoz/tagup-rest-api.svg
 
 This is a simple REST API that performs basic CRUD operations on some fake data!
 
-If you don't want to clone the project yet, you can play with [this deployed version first](https://simple-rest-api-jonofoz.herokuapp.com/api-docs/#/) and test the API there from the SwaggerUI docs.
+If you don't want to clone the project yet, you can play with [this deployed version first](https://simple-rest-api-jonofoz.herokuapp.com/api-docs/#/) and test the API there from the SwaggerUI docs. (If it takes a long time to load, please be patient: Heroku probably put the app to sleep after an hour without any web traffic.)
 
 Before You Install
 ------------------
