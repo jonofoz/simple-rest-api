@@ -1,6 +1,6 @@
 
 
-tagup-rest-api [![Build Status](https://travis-ci.com/jonofoz/tagup-rest-api.svg?token=o3itZ4YG7Vp8DyLad8P4&branch=master)](https://travis-ci.com/jonofoz/tagup-rest-api)
+simple-rest-api [![Build Status](https://travis-ci.com/jonofoz/tagup-rest-api.svg?token=o3itZ4YG7Vp8DyLad8P4&branch=master)](https://travis-ci.com/jonofoz/tagup-rest-api)
 ==============
 
 This is a simple REST API that performs basic CRUD operations on some fake data!
